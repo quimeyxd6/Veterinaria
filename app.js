@@ -4,6 +4,19 @@ const STORAGE_KEYS = {
   LOGGED_IN: "vet_logged_in_user",
 };
 
+const OPERATIONS_OPTIONS = [
+  "Castración",
+  "Piometra",
+  "Cesárea",
+  "Extirpación de tumor"
+];
+
+const STUDIES_OPTIONS = [
+  "Análisis de sangre",
+  "Cardiólogo",
+  "Ecografía"
+];
+
 // ---------- Utilidades de localStorage ----------
 function loadFromStorage(key, defaultValue) {
   try {
@@ -258,6 +271,14 @@ patientForm.addEventListener("submit", (e) => {
 // ---------- Inicialización ----------
 ensureDefaultUser();
 const existingUser = getLoggedInUser();
+// cargar opciones dinámicamente
+loadOptionsIntoSelect("patient-operations", OPERATIONS_OPTIONS);
+loadOptionsIntoSelect("patient-studies", STUDIES_OPTIONS);
+
+// hacer expandibles
+setupExpandableMultiSelect("patient-operations");
+setupExpandableMultiSelect("patient-studies");
+
 if (existingUser) {
   showMain(existingUser);
   showSection("new-patient-section");
@@ -265,3 +286,43 @@ if (existingUser) {
   showLogin();
 }
 
+
+
+function loadOptionsIntoSelect(selectId, optionsArray) {
+  const select = document.getElementById(selectId);
+
+  // limpiar por si recargamos opciones
+  select.innerHTML = "";
+
+  // opción fantasma (placeholder oculto)
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  placeholder.hidden = true;
+  select.appendChild(placeholder);
+
+  // agregar opciones reales
+  optionsArray.forEach(op => {
+    const option = document.createElement("option");
+    option.value = op;
+    option.textContent = op;
+    select.appendChild(option);
+  });
+}
+
+function setupExpandableMultiSelect(selectId) {
+  const select = document.getElementById(selectId);
+
+  select.addEventListener("focus", () => {
+    // abrir con todas las opciones visibles
+    select.size = select.options.length;
+  });
+
+  select.addEventListener("blur", () => {
+    // cerrarlo cuando pierde foco
+    setTimeout(() => {
+      select.size = 1;
+    }, 150);
+  });
+}
