@@ -45,16 +45,10 @@
 
         <!-- PESTAÑAS -->
         <nav class="tabs">
-          <button
-            class="tab-button active"
-            data-target="new-patient-section"
-          >
+          <button class="tab-button active" data-target="new-patient-section">
             Nueva ficha
           </button>
-          <button
-            class="tab-button"
-            data-target="patients-list-section"
-          >
+          <button class="tab-button" data-target="patients-list-section">
             Pacientes guardados
           </button>
         </nav>
@@ -76,42 +70,23 @@
                 <label for="patient-breed">Raza</label>
                 <input id="patient-breed" />
               </div>
-            </div>
-
-            <div class="row">
               <div>
                 <label for="patient-age">Edad del paciente (años)</label>
                 <input id="patient-age" type="number" min="0" step="0.1" />
               </div>
-              <div>
-                <label>Vacunas al día</label>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                  <label>
-                    <input type="radio" name="vaccines" value="Si" />
-                    Sí
-                  </label>
-                  <label>
-                    <input type="radio" name="vaccines" value="No" />
-                    No
-                  </label>
-                </div>
-              </div>
             </div>
 
             <div class="row">
               <div>
-                <label for="patient-operations">Operaciones que tuvo</label>
-                <select id="patient-operations" multiple size="1"></select>
-                <p class="info">
-                  Podés seleccionar varias manteniendo Ctrl (PC) o tocando varias veces (celular, según navegador).
-                </p>
-              </div>
-              <div>
-                <label for="patient-studies">Estudios recientes</label>
-                <select id="patient-studies" multiple size="1"></select>
+                <label>Vacunas al día</label>
+                <div class="inline-radios">
+                  <label><input type="radio" name="vaccines" value="Si">Sí</label>                  
+                  <label><input type="radio" name="vaccines" value="No">No</label>
+                </div>
               </div>
             </div>
 
+            
             <div>
               <label for="owner-name">Nombre del responsable</label>
               <input id="owner-name" required />
@@ -120,8 +95,47 @@
             <div class="row">
               <div>
                 <label for="owner-phone">Teléfono</label>
-                <input id="owner-phone" type="tel" />
+                <input id="owner-phone" type="number" />
               </div>
             </div>
 
             <div>
+              <label for="patient-notes">Notas / Motivo de consulta</label>
+              <textarea id="patient-notes"></textarea>
+            </div>
+
+            <!-- botón de guardar dentro del form -->
+            <button type="submit" class="btn-primary">Guardar ficha</button>
+          </form>
+        </section>
+
+        <!-- SECCIÓN: PACIENTES GUARDADOS -->
+        <section id="patients-list-section" class="hidden">
+          <h2>Pacientes registrados</h2>
+          <div class="info" id="patient-info"></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Especie / Raza</th>
+                  <th>Edad</th>
+                  <th>Vacunas</th>
+                  <th>Operaciones</th>
+                  <th>Estudios recientes</th>
+                  <th>Responsable</th>
+                  <th>Notas</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="patients-body">
+                <!-- se llena con JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

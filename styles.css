@@ -85,6 +85,12 @@ button {
   gap: 8px;
 }
 
+.inline-radios {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -101,6 +107,14 @@ button {
   background: #eff6ff;
   color: #1d4ed8;
   font-size: 0.8rem;
+}
+
+input[type="radio"] {
+  width: auto;
+  padding: 0;
+  border: none;
+  box-sizing: content-box;
+  margin-right: 4px; 
 }
 
 /* PESTAÑAS */

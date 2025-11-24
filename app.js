@@ -227,11 +227,11 @@ patientForm.addEventListener("submit", (e) => {
   const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
   const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
 
-  const operationsSelect = document.getElementById("patient-operations");
+  /*const operationsSelect = document.getElementById("patient-operations");
   const operations = Array.from(operationsSelect.selectedOptions).map(opt => opt.value);
 
   const studiesSelect = document.getElementById("patient-studies");
-  const recentStudies = Array.from(studiesSelect.selectedOptions).map(opt => opt.value);
+  const recentStudies = Array.from(studiesSelect.selectedOptions).map(opt => opt.value);*/
 
   const ownerName = document.getElementById("owner-name").value.trim();
   const ownerPhone = document.getElementById("owner-phone").value.trim();
@@ -250,8 +250,8 @@ patientForm.addEventListener("submit", (e) => {
     breed,
     age,
     vaccinesUpToDate,
-    operations,
-    recentStudies,
+    /*operations,
+    recentStudies,*/
     ownerName,
     ownerPhone,
     notes,
@@ -272,6 +272,7 @@ patientForm.addEventListener("submit", (e) => {
 ensureDefaultUser();
 const existingUser = getLoggedInUser();
 // cargar opciones dinámicamente
+/*
 loadOptionsIntoSelect("patient-operations", OPERATIONS_OPTIONS);
 loadOptionsIntoSelect("patient-studies", STUDIES_OPTIONS);
 
@@ -326,3 +327,4 @@ function setupExpandableMultiSelect(selectId) {
     }, 150);
   });
 }
+*/ //Cancelo el codigo momentaneamente para seguir con otras funcionalidades hasta saber como agregar las opciones dinamicamente sin que se rompa lpm
