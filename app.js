@@ -153,7 +153,6 @@ function setPatients(patients) {
 }
 
 function renderPatients() {
-  // ordenar por fecha descendente (último primero)
   const patients = getPatients().sort((a, b) => {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
@@ -162,6 +161,7 @@ function renderPatients() {
 
   if (patients.length === 0) {
     patientInfo.textContent = "Todavía no hay pacientes cargados.";
+    return;
   } else {
     patientInfo.textContent = `Total de pacientes: ${patients.length}`;
   }
@@ -181,27 +181,56 @@ function renderPatients() {
     const tdPhone = document.createElement("td");
     tdPhone.textContent = p.ownerPhone || "-";
 
-    // Fecha
+    // Fecha (formato corto 24h)
     const tdDate = document.createElement("td");
     const date = new Date(p.createdAt);
     tdDate.textContent = date.toLocaleString("es-AR", {
-    hour12: false,
-    year: "2-digit",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+      hour12: false,
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
 
+    // Acciones
+    const tdActions = document.createElement("td");
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "btn-outline btn-sm";
+    viewBtn.textContent = "Ver / editar";
+    viewBtn.addEventListener("click", () => {
+      window.location.href = `patient.html?id=${encodeURIComponent(p.id)}`;
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "btn-danger btn-sm";
+    deleteBtn.textContent = "Eliminar";
+    deleteBtn.style.marginLeft = "4px";
+    deleteBtn.addEventListener("click", () => {
+      const ok = confirm(`¿Eliminar la ficha de "${p.patientName}"?`);
+      if (!ok) return;
+
+      const updated = getPatients().filter(item => item.id !== p.id);
+      setPatients(updated);
+      renderPatients();
+    });
+
+    tdActions.appendChild(viewBtn);
+    tdActions.appendChild(deleteBtn);
 
     tr.appendChild(tdName);
     tr.appendChild(tdOwner);
     tr.appendChild(tdPhone);
     tr.appendChild(tdDate);
+    tr.appendChild(tdActions);
 
     patientsBody.appendChild(tr);
   });
 }
+
 
 
 patientForm.addEventListener("submit", (e) => {
