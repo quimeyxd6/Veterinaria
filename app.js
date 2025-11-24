@@ -169,53 +169,40 @@ function renderPatients() {
   patients.forEach(p => {
     const tr = document.createElement("tr");
 
+    // Paciente
     const tdName = document.createElement("td");
-    tdName.textContent = p.patientName;
+    tdName.textContent = p.patientName || "-";
 
-    const tdSpecies = document.createElement("td");
-    tdSpecies.textContent = `${p.species || "-"} / ${p.breed || "-"}`;
-
-    const tdAge = document.createElement("td");
-    tdAge.textContent = p.age ? `${p.age} años` : "-";
-
-    const tdVaccines = document.createElement("td");
-    tdVaccines.textContent = p.vaccinesUpToDate || "-";
-
-    const tdOperations = document.createElement("td");
-    tdOperations.textContent =
-      p.operations && p.operations.length > 0
-        ? p.operations.join(", ")
-        : "-";
-
-    const tdStudies = document.createElement("td");
-    tdStudies.textContent =
-      p.recentStudies && p.recentStudies.length > 0
-        ? p.recentStudies.join(", ")
-        : "-";
-
+    // Responsable
     const tdOwner = document.createElement("td");
-    tdOwner.innerHTML = `<strong>${p.ownerName || "-"}</strong><br>${p.ownerPhone || ""}`;
+    tdOwner.textContent = p.ownerName || "-";
 
-    const tdNotes = document.createElement("td");
-    tdNotes.textContent = p.notes || "-";
+    // Teléfono
+    const tdPhone = document.createElement("td");
+    tdPhone.textContent = p.ownerPhone || "-";
 
+    // Fecha
     const tdDate = document.createElement("td");
     const date = new Date(p.createdAt);
-    tdDate.textContent = date.toLocaleString();
+    tdDate.textContent = date.toLocaleString("es-AR", {
+    hour12: false,
+    year: "2-digit",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
 
     tr.appendChild(tdName);
-    tr.appendChild(tdSpecies);
-    tr.appendChild(tdAge);
-    tr.appendChild(tdVaccines);
-    tr.appendChild(tdOperations);
-    tr.appendChild(tdStudies);
     tr.appendChild(tdOwner);
-    tr.appendChild(tdNotes);
+    tr.appendChild(tdPhone);
     tr.appendChild(tdDate);
 
     patientsBody.appendChild(tr);
   });
 }
+
 
 patientForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -271,8 +258,10 @@ patientForm.addEventListener("submit", (e) => {
 // ---------- Inicialización ----------
 ensureDefaultUser();
 const existingUser = getLoggedInUser();
+
+/* Cancelo el codigo momentaneamente para seguir con otras funcionalidades hasta saber como agregar las opciones dinamicamente sin que se rompa lpm
 // cargar opciones dinámicamente
-/*
+
 loadOptionsIntoSelect("patient-operations", OPERATIONS_OPTIONS);
 loadOptionsIntoSelect("patient-studies", STUDIES_OPTIONS);
 
@@ -286,8 +275,6 @@ if (existingUser) {
 } else {
   showLogin();
 }
-
-
 
 function loadOptionsIntoSelect(selectId, optionsArray) {
   const select = document.getElementById(selectId);
@@ -327,4 +314,4 @@ function setupExpandableMultiSelect(selectId) {
     }, 150);
   });
 }
-*/ //Cancelo el codigo momentaneamente para seguir con otras funcionalidades hasta saber como agregar las opciones dinamicamente sin que se rompa lpm
+*/ 

@@ -78,24 +78,23 @@
 
             <div class="row">
               <div>
+                <label for="owner-name">Nombre del responsable</label>
+                <input id="owner-name" required />
+              </div>
+
+              <div>
+                <label for="owner-phone">Teléfono</label>
+                <input id="owner-phone" type="number" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
                 <label>Vacunas al día</label>
                 <div class="inline-radios">
                   <label><input type="radio" name="vaccines" value="Si">Sí</label>                  
                   <label><input type="radio" name="vaccines" value="No">No</label>
                 </div>
-              </div>
-            </div>
-
-            
-            <div>
-              <label for="owner-name">Nombre del responsable</label>
-              <input id="owner-name" required />
-            </div>
-
-            <div class="row">
-              <div>
-                <label for="owner-phone">Teléfono</label>
-                <input id="owner-phone" type="number" />
               </div>
             </div>
 
@@ -113,18 +112,13 @@
         <section id="patients-list-section" class="hidden">
           <h2>Pacientes registrados</h2>
           <div class="info" id="patient-info"></div>
-          <div style="overflow-x:auto;">
+          <div style=>
             <table>
               <thead>
                 <tr>
                   <th>Paciente</th>
-                  <th>Especie / Raza</th>
-                  <th>Edad</th>
-                  <th>Vacunas</th>
-                  <th>Operaciones</th>
-                  <th>Estudios recientes</th>
                   <th>Responsable</th>
-                  <th>Notas</th>
+                  <th>Telefono</th>
                   <th>Fecha</th>
                 </tr>
               </thead>
