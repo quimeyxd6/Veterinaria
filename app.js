@@ -272,6 +272,7 @@ patientForm.addEventListener("submit", (e) => {
 ensureDefaultUser();
 const existingUser = getLoggedInUser();
 // cargar opciones dinámicamente
+/*
 loadOptionsIntoSelect("patient-operations", OPERATIONS_OPTIONS);
 loadOptionsIntoSelect("patient-studies", STUDIES_OPTIONS);
 
@@ -326,3 +327,4 @@ function setupExpandableMultiSelect(selectId) {
     }, 150);
   });
 }
+*/ //Cancelo el codigo momentaneamente para seguir con otras funcionalidades hasta saber como agregar las opciones dinamicamente sin que se rompa lpm
