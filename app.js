@@ -227,11 +227,11 @@ patientForm.addEventListener("submit", (e) => {
   const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
   const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
 
-  const operationsSelect = document.getElementById("patient-operations");
+  /*const operationsSelect = document.getElementById("patient-operations");
   const operations = Array.from(operationsSelect.selectedOptions).map(opt => opt.value);
 
   const studiesSelect = document.getElementById("patient-studies");
-  const recentStudies = Array.from(studiesSelect.selectedOptions).map(opt => opt.value);
+  const recentStudies = Array.from(studiesSelect.selectedOptions).map(opt => opt.value);*/
 
   const ownerName = document.getElementById("owner-name").value.trim();
   const ownerPhone = document.getElementById("owner-phone").value.trim();
@@ -250,8 +250,8 @@ patientForm.addEventListener("submit", (e) => {
     breed,
     age,
     vaccinesUpToDate,
-    operations,
-    recentStudies,
+    /*operations,
+    recentStudies,*/
     ownerName,
     ownerPhone,
     notes,
