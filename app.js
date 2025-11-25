@@ -231,8 +231,48 @@ function renderPatients() {
   });
 }
 
+function validatePatientData({ patientName, species, age, ownerName, ownerPhone }) {
+  const errors = {};
 
+  // Nombre del paciente
+  if (!patientName || patientName.trim().length < 2) {
+    errors.patientName = "El nombre del paciente debe tener al menos 2 caracteres.";
+  }
 
+  // Especie
+  if (!species || species.trim().length < 3) {
+    errors.species = "La especie es obligatoria (mínimo 3 caracteres).";
+  }
+
+  // Edad (si se ingresó)
+  if (age !== undefined && age !== null && String(age).trim() !== "") {
+    const n = Number(age);
+    if (Number.isNaN(n)) {
+      errors.age = "La edad debe ser un número.";
+    } else if (n < 0) {
+      errors.age = "La edad no puede ser negativa.";
+    } else if (n > 40) {
+      errors.age = "Revisá la edad: parece demasiado alta.";
+    }
+  }
+
+  // Responsable
+  if (!ownerName || ownerName.trim().length < 3) {
+    errors.ownerName = "El nombre del responsable debe tener al menos 3 caracteres.";
+  }
+
+  // Teléfono (si se ingresó)
+  if (ownerPhone && ownerPhone.trim() !== "") {
+    const phonePattern = /^[0-9+\-\s()]{6,20}$/;
+    if (!phonePattern.test(ownerPhone.trim())) {
+      errors.ownerPhone = "El teléfono contiene caracteres inválidos o es demasiado corto.";
+    }
+  }
+
+  return errors;
+}
+
+// El siguiente lanzador guarda los datos pero no los valida, igualmente quiero guardar éste codigo que me puede ser util en algún momento
 patientForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const patientName = document.getElementById("patient-name").value.trim();
@@ -283,6 +323,34 @@ patientForm.addEventListener("submit", (e) => {
   // al guardar, vamos a la pestaña de pacientes guardados
   showSection("patients-list-section");
 });
+
+patientForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const patientName = document.getElementById("patient-name").value;
+  const species = document.getElementById("patient-species").value;
+  const age = document.getElementById("patient-age").value;
+  const ownerName = document.getElementById("owner-name").value;
+  const ownerPhone = document.getElementById("owner-phone").value;
+
+  const errors = validatePatientData({
+    patientName,
+    species,
+    age,
+    ownerName,
+    ownerPhone,
+  });
+
+  if (Object.keys(errors).length > 0) {
+    // versión simple: mostrar todo junto
+    alert(Object.values(errors).join("\n"));
+    return;
+  }
+
+  // si no hay errores -> seguir guardando como ya lo hacés
+  // ...
+});
+
 
 // ---------- Inicialización ----------
 ensureDefaultUser();
