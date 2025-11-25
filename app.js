@@ -231,33 +231,78 @@ function renderPatients() {
   });
 }
 
+function validatePatientData({ patientName, species, age, ownerName, ownerPhone }) {
+  const errors = {};
 
+  // Nombre del paciente
+  if (!patientName || patientName.trim().length < 2) {
+    errors.patientName = "El nombre del paciente debe tener al menos 2 caracteres.";
+  }
+
+  // Especie
+  if (!species || species.trim().length < 3) {
+    errors.species = "La especie es obligatoria (mínimo 3 caracteres).";
+  }
+
+  // Edad (si se ingresó)
+  if (age !== undefined && age !== null && String(age).trim() !== "") {
+    const n = Number(age);
+    if (Number.isNaN(n)) {
+      errors.age = "La edad debe ser un número.";
+    } else if (n < 0) {
+      errors.age = "La edad no puede ser negativa.";
+    } else if (n > 40) {
+      errors.age = "Revisá la edad: parece demasiado alta.";
+    }
+  }
+
+  // Responsable
+  if (!ownerName || ownerName.trim().length < 3) {
+    errors.ownerName = "El nombre del responsable debe tener al menos 3 caracteres.";
+  }
+
+  // Teléfono (si se ingresó)
+  if (ownerPhone && ownerPhone.trim() !== "") {
+    const phonePattern = /^[0-9+\-\s()]{6,20}$/;
+    if (!phonePattern.test(ownerPhone.trim())) {
+      errors.ownerPhone = "El teléfono contiene caracteres inválidos o es demasiado corto.";
+    }
+  }
+
+  return errors;
+}
 
 patientForm.addEventListener("submit", (e) => {
   e.preventDefault();
+
+  // leer valores del formulario
   const patientName = document.getElementById("patient-name").value.trim();
   const species = document.getElementById("patient-species").value.trim();
   const breed = document.getElementById("patient-breed").value.trim();
   const age = document.getElementById("patient-age").value.trim();
-
-  const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
-  const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
-
-  /*const operationsSelect = document.getElementById("patient-operations");
-  const operations = Array.from(operationsSelect.selectedOptions).map(opt => opt.value);
-
-  const studiesSelect = document.getElementById("patient-studies");
-  const recentStudies = Array.from(studiesSelect.selectedOptions).map(opt => opt.value);*/
-
   const ownerName = document.getElementById("owner-name").value.trim();
   const ownerPhone = document.getElementById("owner-phone").value.trim();
   const notes = document.getElementById("patient-notes").value.trim();
 
-  if (!patientName || !species || !ownerName) {
-    alert("Completá al menos: nombre del paciente, especie y responsable.");
-    return;
+  const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
+  const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
+
+  // VALIDACIÓN
+  const errors = validatePatientData({
+    patientName,
+    species,
+    age,
+    ownerName,
+    ownerPhone,
+  });
+
+  if (Object.keys(errors).length > 0) {
+    // mostrar todos los errores juntos
+    alert(Object.values(errors).join("\n"));
+    return; // ⛔ NO GUARDAR
   }
 
+  // SI LLEGA ACÁ, ESTÁ TODO OK → GUARDAMOS
   const patients = getPatients();
   const newPatient = {
     id: Date.now().toString(),
@@ -266,8 +311,7 @@ patientForm.addEventListener("submit", (e) => {
     breed,
     age,
     vaccinesUpToDate,
-    /*operations,
-    recentStudies,*/
+    // por ahora sin operations/recentStudies
     ownerName,
     ownerPhone,
     notes,
@@ -279,68 +323,5 @@ patientForm.addEventListener("submit", (e) => {
   renderPatients();
 
   patientForm.reset();
-
-  // al guardar, vamos a la pestaña de pacientes guardados
   showSection("patients-list-section");
 });
-
-// ---------- Inicialización ----------
-ensureDefaultUser();
-const existingUser = getLoggedInUser();
-
-/* Cancelo el codigo momentaneamente para seguir con otras funcionalidades hasta saber como agregar las opciones dinamicamente sin que se rompa lpm
-// cargar opciones dinámicamente
-
-loadOptionsIntoSelect("patient-operations", OPERATIONS_OPTIONS);
-loadOptionsIntoSelect("patient-studies", STUDIES_OPTIONS);
-
-// hacer expandibles
-setupExpandableMultiSelect("patient-operations");
-setupExpandableMultiSelect("patient-studies");
-
-if (existingUser) {
-  showMain(existingUser);
-  showSection("new-patient-section");
-} else {
-  showLogin();
-}
-
-function loadOptionsIntoSelect(selectId, optionsArray) {
-  const select = document.getElementById(selectId);
-
-  // limpiar por si recargamos opciones
-  select.innerHTML = "";
-
-  // opción fantasma (placeholder oculto)
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.disabled = true;
-  placeholder.selected = true;
-  placeholder.hidden = true;
-  select.appendChild(placeholder);
-
-  // agregar opciones reales
-  optionsArray.forEach(op => {
-    const option = document.createElement("option");
-    option.value = op;
-    option.textContent = op;
-    select.appendChild(option);
-  });
-}
-
-function setupExpandableMultiSelect(selectId) {
-  const select = document.getElementById(selectId);
-
-  select.addEventListener("focus", () => {
-    // abrir con todas las opciones visibles
-    select.size = select.options.length;
-  });
-
-  select.addEventListener("blur", () => {
-    // cerrarlo cuando pierde foco
-    setTimeout(() => {
-      select.size = 1;
-    }, 150);
-  });
-}
-*/ 
