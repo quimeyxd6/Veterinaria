@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ficha de paciente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="patient.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <h1>Ficha de paciente</h1>
+      <button id="back-btn" class="btn-secondary btn-sm">← Volver al listado</button>
+      <p class="info" id="patient-edit-info"></p>
+
+      <form id="edit-patient-form">
+        <div class="row">
+          <div>
+            <label for="edit-patient-name">Nombre del paciente</label>
+            <input id="edit-patient-name" required />
+          </div>
+          <div>
+            <label for="edit-patient-species">Especie</label>
+            <input id="edit-patient-species" required />
+          </div>
+          <div>
+            <label for="edit-patient-breed">Raza</label>
+            <input id="edit-patient-breed" />
+          </div>
+          <div>
+            <label for="edit-patient-age">Edad (años)</label>
+            <input id="edit-patient-age" type="number" min="0" step="0.1" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Vacunas al día</label>
+            <div class="inline-radios">
+              <label><input type="radio" name="edit-vaccines" value="Si"> Sí</label>
+              <label><input type="radio" name="edit-vaccines" value="No"> No</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Operaciones que tuvo</label>
+            <div id="edit-operations-chips" class="chips-container"></div>
+          </div>
+          <div>
+            <label>Estudios recientes</label>
+            <div id="edit-studies-chips" class="chips-container"></div>
+          </div>
+        </div>
+
+        <div>
+          <label for="edit-owner-name">Nombre del responsable</label>
+          <input id="edit-owner-name" required />
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="edit-owner-phone">Teléfono</label>
+            <input id="edit-owner-phone" type="tel" />
+          </div>
+        </div>
+
+        <div>
+          <label for="edit-patient-notes">Notas / Motivo de consulta</label>
+          <textarea id="edit-patient-notes"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Guardar cambios</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
