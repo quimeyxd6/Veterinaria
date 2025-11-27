@@ -172,6 +172,36 @@ th {
   margin-bottom: 8px;
 }
 
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+}
+.btn-danger:hover {
+  filter: brightness(0.9);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #111827;
+}
+.btn-outline:hover {
+  background: #e5e7eb;
+}
+
+.input-error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  margin: 2px 0 0;
+  min-height: 14px; /* reserva espacio aunque no haya error */
+}
+
+
 @media (max-width: 600px) {
   .card {
     padding: 12px;

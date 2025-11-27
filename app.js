@@ -153,7 +153,6 @@ function setPatients(patients) {
 }
 
 function renderPatients() {
-  // ordenar por fecha descendente (último primero)
   const patients = getPatients().sort((a, b) => {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
@@ -162,6 +161,7 @@ function renderPatients() {
 
   if (patients.length === 0) {
     patientInfo.textContent = "Todavía no hay pacientes cargados.";
+    return;
   } else {
     patientInfo.textContent = `Total de pacientes: ${patients.length}`;
   }
@@ -169,78 +169,161 @@ function renderPatients() {
   patients.forEach(p => {
     const tr = document.createElement("tr");
 
+    // Paciente
     const tdName = document.createElement("td");
-    tdName.textContent = p.patientName;
+    tdName.textContent = p.patientName || "-";
 
-    const tdSpecies = document.createElement("td");
-    tdSpecies.textContent = `${p.species || "-"} / ${p.breed || "-"}`;
-
-    const tdAge = document.createElement("td");
-    tdAge.textContent = p.age ? `${p.age} años` : "-";
-
-    const tdVaccines = document.createElement("td");
-    tdVaccines.textContent = p.vaccinesUpToDate || "-";
-
-    const tdOperations = document.createElement("td");
-    tdOperations.textContent =
-      p.operations && p.operations.length > 0
-        ? p.operations.join(", ")
-        : "-";
-
-    const tdStudies = document.createElement("td");
-    tdStudies.textContent =
-      p.recentStudies && p.recentStudies.length > 0
-        ? p.recentStudies.join(", ")
-        : "-";
-
+    // Responsable
     const tdOwner = document.createElement("td");
-    tdOwner.innerHTML = `<strong>${p.ownerName || "-"}</strong><br>${p.ownerPhone || ""}`;
+    tdOwner.textContent = p.ownerName || "-";
 
-    const tdNotes = document.createElement("td");
-    tdNotes.textContent = p.notes || "-";
+    // Teléfono
+    const tdPhone = document.createElement("td");
+    tdPhone.textContent = p.ownerPhone || "-";
 
+    // Fecha (formato corto 24h)
     const tdDate = document.createElement("td");
     const date = new Date(p.createdAt);
-    tdDate.textContent = date.toLocaleString();
+    tdDate.textContent = date.toLocaleString("es-AR", {
+      hour12: false,
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    // Acciones
+    const tdActions = document.createElement("td");
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "btn-outline btn-sm";
+    viewBtn.textContent = "Ver / editar";
+    viewBtn.addEventListener("click", () => {
+      window.location.href = `patient.html?id=${encodeURIComponent(p.id)}`;
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "btn-danger btn-sm";
+    deleteBtn.textContent = "Eliminar";
+    deleteBtn.style.marginLeft = "4px";
+    deleteBtn.addEventListener("click", () => {
+      const ok = confirm(`¿Eliminar la ficha de "${p.patientName}"?`);
+      if (!ok) return;
+
+      const updated = getPatients().filter(item => item.id !== p.id);
+      setPatients(updated);
+      renderPatients();
+    });
+
+    tdActions.appendChild(viewBtn);
+    tdActions.appendChild(deleteBtn);
 
     tr.appendChild(tdName);
-    tr.appendChild(tdSpecies);
-    tr.appendChild(tdAge);
-    tr.appendChild(tdVaccines);
-    tr.appendChild(tdOperations);
-    tr.appendChild(tdStudies);
     tr.appendChild(tdOwner);
-    tr.appendChild(tdNotes);
+    tr.appendChild(tdPhone);
     tr.appendChild(tdDate);
+    tr.appendChild(tdActions);
 
     patientsBody.appendChild(tr);
   });
 }
 
+function validatePatientData({ patientName, species, age, ownerName, ownerPhone }) {
+  const errors = {};
+
+  // Nombre del paciente
+  if (!patientName || patientName.trim().length < 2) {
+    errors.patientName = "El nombre del paciente debe tener al menos 2 caracteres.";
+  }
+
+  // Especie
+  if (!species || species.trim().length < 3) {
+    errors.species = "La especie es obligatoria (mínimo 3 caracteres).";
+  }
+
+  // Edad (si se ingresó)
+  if (age !== undefined && age !== null && String(age).trim() !== "") {
+    const n = Number(age);
+    if (Number.isNaN(n)) {
+      errors.age = "La edad debe ser un número.";
+    } else if (n < 0) {
+      errors.age = "La edad no puede ser negativa.";
+    } else if (n > 40) {
+      errors.age = "Revisá la edad: parece demasiado alta.";
+    }
+  }
+
+  // Responsable
+  if (!ownerName || ownerName.trim().length < 3) {
+    errors.ownerName = "El nombre del responsable debe tener al menos 3 caracteres.";
+  }
+
+  // Teléfono (si se ingresó)
+if (ownerPhone && ownerPhone.trim() !== "") {
+  const cleaned = ownerPhone.replace(/\D+/g, ""); // solo dígitos
+
+  // Teléfono argentino: opcional 00 / 54 / 9, código de área (11 o 2/3/6/8 + 1–3 dígitos más),
+  // opcional 15, y luego 6 a 8 dígitos de número.
+  const argPhonePattern = /^(?:00)?(?:54)?9?(?:11|[2368]\d{1,3})(?:15)?\d{6,8}$/;
+
+  if (!argPhonePattern.test(cleaned)) {
+    errors.ownerPhone = "Ingresá un teléfono argentino válido (incluyendo código de área).";
+  }
+}
+
+  return errors;
+}
+
+function clearErrors() {
+  document.querySelectorAll(".input-error").forEach(el => {
+    el.textContent = "";
+  });
+}
+
+function showErrors(errors) {
+  clearErrors();
+  for (const field in errors) {
+    const el = document.getElementById(`error-${field}`);
+    if (el) {
+      el.textContent = errors[field];
+    }
+  }
+}
+
 patientForm.addEventListener("submit", (e) => {
   e.preventDefault();
+
+  // leer valores del formulario
   const patientName = document.getElementById("patient-name").value.trim();
   const species = document.getElementById("patient-species").value.trim();
   const breed = document.getElementById("patient-breed").value.trim();
   const age = document.getElementById("patient-age").value.trim();
-
-  const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
-  const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
-
-  /*const operationsSelect = document.getElementById("patient-operations");
-  const operations = Array.from(operationsSelect.selectedOptions).map(opt => opt.value);
-
-  const studiesSelect = document.getElementById("patient-studies");
-  const recentStudies = Array.from(studiesSelect.selectedOptions).map(opt => opt.value);*/
-
   const ownerName = document.getElementById("owner-name").value.trim();
   const ownerPhone = document.getElementById("owner-phone").value.trim();
   const notes = document.getElementById("patient-notes").value.trim();
 
-  if (!patientName || !species || !ownerName) {
-    alert("Completá al menos: nombre del paciente, especie y responsable.");
-    return;
+  const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
+  const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
+
+  // VALIDACIÓN
+  const errors = validatePatientData({
+    patientName,
+    species,
+    age,
+    ownerName,
+    ownerPhone,
+  });
+
+  if (Object.keys(errors).length > 0) {
+    showErrors(errors);
+    return; // NO guardar
   }
+
+  // SI LLEGA ACÁ, ESTÁ TODO OK → GUARDAMOS
+  clearErrors();
 
   const patients = getPatients();
   const newPatient = {
@@ -250,8 +333,7 @@ patientForm.addEventListener("submit", (e) => {
     breed,
     age,
     vaccinesUpToDate,
-    /*operations,
-    recentStudies,*/
+    // por ahora sin operations/recentStudies
     ownerName,
     ownerPhone,
     notes,
@@ -263,68 +345,6 @@ patientForm.addEventListener("submit", (e) => {
   renderPatients();
 
   patientForm.reset();
-
-  // al guardar, vamos a la pestaña de pacientes guardados
+  
   showSection("patients-list-section");
 });
-
-// ---------- Inicialización ----------
-ensureDefaultUser();
-const existingUser = getLoggedInUser();
-// cargar opciones dinámicamente
-/*
-loadOptionsIntoSelect("patient-operations", OPERATIONS_OPTIONS);
-loadOptionsIntoSelect("patient-studies", STUDIES_OPTIONS);
-
-// hacer expandibles
-setupExpandableMultiSelect("patient-operations");
-setupExpandableMultiSelect("patient-studies");
-
-if (existingUser) {
-  showMain(existingUser);
-  showSection("new-patient-section");
-} else {
-  showLogin();
-}
-
-
-
-function loadOptionsIntoSelect(selectId, optionsArray) {
-  const select = document.getElementById(selectId);
-
-  // limpiar por si recargamos opciones
-  select.innerHTML = "";
-
-  // opción fantasma (placeholder oculto)
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.disabled = true;
-  placeholder.selected = true;
-  placeholder.hidden = true;
-  select.appendChild(placeholder);
-
-  // agregar opciones reales
-  optionsArray.forEach(op => {
-    const option = document.createElement("option");
-    option.value = op;
-    option.textContent = op;
-    select.appendChild(option);
-  });
-}
-
-function setupExpandableMultiSelect(selectId) {
-  const select = document.getElementById(selectId);
-
-  select.addEventListener("focus", () => {
-    // abrir con todas las opciones visibles
-    select.size = select.options.length;
-  });
-
-  select.addEventListener("blur", () => {
-    // cerrarlo cuando pierde foco
-    setTimeout(() => {
-      select.size = 1;
-    }, 150);
-  });
-}
-*/ //Cancelo el codigo momentaneamente para seguir con otras funcionalidades hasta saber como agregar las opciones dinamicamente sin que se rompa lpm
