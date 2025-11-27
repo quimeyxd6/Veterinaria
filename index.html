@@ -61,10 +61,12 @@
               <div>
                 <label for="patient-name">Nombre del paciente</label>
                 <input id="patient-name" required />
+                <p class="input-error" id="error-patientName"></p>
               </div>
               <div>
                 <label for="patient-species">Especie</label>
                 <input id="patient-species" placeholder="Perro, gato, etc." required />
+                <p class="input-error" id="error-species"></p>
               </div>
               <div>
                 <label for="patient-breed">Raza</label>
@@ -73,6 +75,7 @@
               <div>
                 <label for="patient-age">Edad del paciente (años)</label>
                 <input id="patient-age" type="number" min="0" step="0.1" />
+                <p class="input-error" id="error-age"></p>
               </div>
             </div>
 
@@ -80,11 +83,13 @@
               <div>
                 <label for="owner-name">Nombre del responsable</label>
                 <input id="owner-name" required />
+                <p class="input-error" id="error-ownerName"></p>
               </div>
 
               <div>
                 <label for="owner-phone">Teléfono</label>
                 <input id="owner-phone" type="number" />
+                <p class="input-error" id="error-ownerPhone"></p>
               </div>
             </div>
 

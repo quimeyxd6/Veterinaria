@@ -272,6 +272,22 @@ function validatePatientData({ patientName, species, age, ownerName, ownerPhone 
   return errors;
 }
 
+function clearErrors() {
+  document.querySelectorAll(".input-error").forEach(el => {
+    el.textContent = "";
+  });
+}
+
+function showErrors(errors) {
+  clearErrors();
+  for (const field in errors) {
+    const el = document.getElementById(`error-${field}`);
+    if (el) {
+      el.textContent = errors[field];
+    }
+  }
+}
+
 patientForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -297,12 +313,13 @@ patientForm.addEventListener("submit", (e) => {
   });
 
   if (Object.keys(errors).length > 0) {
-    // mostrar todos los errores juntos
-    alert(Object.values(errors).join("\n"));
-    return; // ⛔ NO GUARDAR
+    showErrors(errors);
+    return; // NO guardar
   }
 
   // SI LLEGA ACÁ, ESTÁ TODO OK → GUARDAMOS
+  clearErrors();
+
   const patients = getPatients();
   const newPatient = {
     id: Date.now().toString(),
@@ -323,5 +340,6 @@ patientForm.addEventListener("submit", (e) => {
   renderPatients();
 
   patientForm.reset();
+  
   showSection("patients-list-section");
 });
