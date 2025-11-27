@@ -262,12 +262,17 @@ function validatePatientData({ patientName, species, age, ownerName, ownerPhone 
   }
 
   // Teléfono (si se ingresó)
-  if (ownerPhone && ownerPhone.trim() !== "") {
-    const phonePattern = /^[0-9+\-\s()]{6,20}$/;
-    if (!phonePattern.test(ownerPhone.trim())) {
-      errors.ownerPhone = "El teléfono contiene caracteres inválidos o es demasiado corto.";
-    }
+if (ownerPhone && ownerPhone.trim() !== "") {
+  const cleaned = ownerPhone.replace(/\D+/g, ""); // solo dígitos
+
+  // Teléfono argentino: opcional 00 / 54 / 9, código de área (11 o 2/3/6/8 + 1–3 dígitos más),
+  // opcional 15, y luego 6 a 8 dígitos de número.
+  const argPhonePattern = /^(?:00)?(?:54)?9?(?:11|[2368]\d{1,3})(?:15)?\d{6,8}$/;
+
+  if (!argPhonePattern.test(cleaned)) {
+    errors.ownerPhone = "Ingresá un teléfono argentino válido (incluyendo código de área).";
   }
+}
 
   return errors;
 }
