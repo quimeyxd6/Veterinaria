@@ -262,17 +262,17 @@ function validatePatientData({ patientName, species, age, ownerName, ownerPhone 
   }
 
   // Teléfono (si se ingresó)
-if (ownerPhone && ownerPhone.trim() !== "") {
-  const cleaned = ownerPhone.replace(/\D+/g, ""); // solo dígitos
+  if (ownerPhone && ownerPhone.trim() !== "") {
+    const cleaned = ownerPhone.replace(/\D+/g, ""); // solo dígitos
 
-  // Teléfono argentino: opcional 00 / 54 / 9, código de área (11 o 2/3/6/8 + 1–3 dígitos más),
-  // opcional 15, y luego 6 a 8 dígitos de número.
-  const argPhonePattern = /^(?:00)?(?:54)?9?(?:11|[2368]\d{1,3})(?:15)?\d{6,8}$/;
+    // Teléfono argentino: opcional 00 / 54 / 9, código de área (11 o 2/3/6/8 + 1–3 dígitos más),
+    // opcional 15, y luego 6 a 8 dígitos de número.
+    const argPhonePattern = /^(?:00)?(?:54)?9?(?:11|[2368]\d{1,3})(?:15)?\d{6,8}$/;
 
-  if (!argPhonePattern.test(cleaned)) {
-    errors.ownerPhone = "Ingresá un teléfono argentino válido (incluyendo código de área).";
+    if (!argPhonePattern.test(cleaned)) {
+      errors.ownerPhone = "Ingresá un teléfono argentino válido (incluyendo código de área).";
+    }
   }
-}
 
   return errors;
 }
@@ -293,6 +293,74 @@ function showErrors(errors) {
   }
 }
 
+// ---------- Multi-select Operaciones / Estudios ---------- // <<< NUEVO
+function initMultiSelect(rootId, optionsArray, placeholderText) {
+  const root = document.getElementById(rootId);
+  if (!root) return;
+
+  const input = root.querySelector(".multi-select-input");
+  const dropdown = root.querySelector(".multi-select-dropdown");
+
+  function updateInputLabel() {
+    const selected = Array.from(
+      dropdown.querySelectorAll(".multi-select-option.selected")
+    ).map(opt => opt.dataset.value);
+
+    if (selected.length === 0) {
+      input.textContent = placeholderText;
+      input.classList.add("placeholder");
+    } else {
+      input.textContent = selected.join(", ");
+      input.classList.remove("placeholder");
+    }
+  }
+
+  // rellenar la lista de opciones
+  dropdown.innerHTML = "";
+  optionsArray.forEach(op => {
+    const optionEl = document.createElement("div");
+    optionEl.className = "multi-select-option";
+    optionEl.textContent = op;
+    optionEl.dataset.value = op;
+
+    optionEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      optionEl.classList.toggle("selected");
+      updateInputLabel();
+    });
+
+    dropdown.appendChild(optionEl);
+  });
+
+  // estado inicial
+  input.textContent = placeholderText;
+  input.classList.add("placeholder");
+
+  function toggleOpen() {
+    root.classList.toggle("open");
+  }
+
+  input.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleOpen();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleOpen();
+    }
+  });
+
+  // cerrar si clickeamos afuera
+  document.addEventListener("click", (e) => {
+    if (!root.contains(e.target)) {
+      root.classList.remove("open");
+    }
+  });
+}
+
+// ---------- Submit del formulario ----------
 patientForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -307,6 +375,15 @@ patientForm.addEventListener("submit", (e) => {
 
   const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
   const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
+
+  // <<< NUEVO: leer multi-select de operaciones y estudios
+  const operations = Array.from(
+    document.querySelectorAll("#operations-multiselect .multi-select-option.selected")
+  ).map(opt => opt.dataset.value);
+
+  const recentStudies = Array.from(
+    document.querySelectorAll("#studies-multiselect .multi-select-option.selected")
+  ).map(opt => opt.dataset.value);
 
   // VALIDACIÓN
   const errors = validatePatientData({
@@ -333,7 +410,8 @@ patientForm.addEventListener("submit", (e) => {
     breed,
     age,
     vaccinesUpToDate,
-    // por ahora sin operations/recentStudies
+    operations,      // <<< NUEVO
+    recentStudies,   // <<< NUEVO
     ownerName,
     ownerPhone,
     notes,
@@ -345,6 +423,20 @@ patientForm.addEventListener("submit", (e) => {
   renderPatients();
 
   patientForm.reset();
-  
   showSection("patients-list-section");
 });
+
+// ---------- Inicialización global ---------- // <<< NUEVO
+ensureDefaultUser();
+const existingUser = getLoggedInUser();
+
+// inicializar multi-selects después de que el DOM existe (script con defer)
+initMultiSelect("operations-multiselect", OPERATIONS_OPTIONS, "Operaciones");
+initMultiSelect("studies-multiselect", STUDIES_OPTIONS, "Estudios");
+
+if (existingUser) {
+  showMain(existingUser);
+  showSection("new-patient-section");
+} else {
+  showLogin();
+}
