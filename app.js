@@ -341,7 +341,7 @@ function initMultiSelect(rootId, optionsArray, placeholderText) {
   }
 
   input.addEventListener("click", (e) => {
-    e.stopPropagation();
+    //e.stopPropagation();// No necesario. No permite al evento llegar al document.
     toggleOpen();
   });
 
