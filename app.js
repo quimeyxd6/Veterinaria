@@ -97,6 +97,16 @@ loginForm.addEventListener("submit", (e) => {
   loginError.textContent = "";
   setLoggedInUser({ email: found.email, name: found.name });
   showMain(found);
+
+  // Al loguear, si la URL trae ?view=list, mostrar listado de fichas
+  const params = new URLSearchParams(window.location.search);
+  const view = params.get("view");
+  if (view === "list") {
+    showSection("patients-list-section");
+  } else {
+    // Por defecto, también podemos dejar el listado
+    showSection("patients-list-section");
+  }
 });
 
 // ---------- Logout ----------
@@ -201,7 +211,10 @@ function renderPatients() {
     viewBtn.className = "btn-outline btn-sm";
     viewBtn.textContent = "Ver / editar";
     viewBtn.addEventListener("click", () => {
-      window.location.href = `patient.html?id=${encodeURIComponent(p.id)}`;
+      window.open(
+        `patient.html?id=${encodeURIComponent(p.id)}`,
+        "_blank"
+      );
     });
 
     const deleteBtn = document.createElement("button");
@@ -265,8 +278,7 @@ function validatePatientData({ patientName, species, age, ownerName, ownerPhone 
   if (ownerPhone && ownerPhone.trim() !== "") {
     const cleaned = ownerPhone.replace(/\D+/g, ""); // solo dígitos
 
-    // Teléfono argentino: opcional 00 / 54 / 9, código de área (11 o 2/3/6/8 + 1–3 dígitos más),
-    // opcional 15, y luego 6 a 8 dígitos de número.
+    // Teléfono argentino
     const argPhonePattern = /^(?:00)?(?:54)?9?(?:11|[2368]\d{1,3})(?:15)?\d{6,8}$/;
 
     if (!argPhonePattern.test(cleaned)) {
@@ -293,7 +305,7 @@ function showErrors(errors) {
   }
 }
 
-// ---------- Multi-select Operaciones / Estudios ---------- // <<< NUEVO
+// ---------- Multi-select Operaciones / Estudios ----------
 function initMultiSelect(rootId, optionsArray, placeholderText) {
   const root = document.getElementById(rootId);
   if (!root) return;
@@ -341,7 +353,9 @@ function initMultiSelect(rootId, optionsArray, placeholderText) {
   }
 
   input.addEventListener("click", (e) => {
-    //e.stopPropagation();// No necesario. No permite al evento llegar al document.
+    // Antes tenías e.stopPropagation(); lo dejamos comentado
+    // para que el click pueda llegar al document y cerrar otros selects
+    // e.stopPropagation();
     toggleOpen();
   });
 
@@ -376,7 +390,7 @@ patientForm.addEventListener("submit", (e) => {
   const vaccinesRadio = document.querySelector('input[name="vaccines"]:checked');
   const vaccinesUpToDate = vaccinesRadio ? vaccinesRadio.value : "";
 
-  // <<< NUEVO: leer multi-select de operaciones y estudios
+  // leer multi-select de operaciones y estudios
   const operations = Array.from(
     document.querySelectorAll("#operations-multiselect .multi-select-option.selected")
   ).map(opt => opt.dataset.value);
@@ -410,8 +424,8 @@ patientForm.addEventListener("submit", (e) => {
     breed,
     age,
     vaccinesUpToDate,
-    operations,      // <<< NUEVO
-    recentStudies,   // <<< NUEVO
+    operations,
+    recentStudies,
     ownerName,
     ownerPhone,
     notes,
@@ -423,10 +437,10 @@ patientForm.addEventListener("submit", (e) => {
   renderPatients();
 
   patientForm.reset();
-  showSection("patients-list-section");
+  showSection("patients-list-section"); // al guardar nueva ficha, ir al listado
 });
 
-// ---------- Inicialización global ---------- // <<< NUEVO
+// ---------- Inicialización global ----------
 ensureDefaultUser();
 const existingUser = getLoggedInUser();
 
@@ -436,7 +450,16 @@ initMultiSelect("studies-multiselect", STUDIES_OPTIONS, "Estudios");
 
 if (existingUser) {
   showMain(existingUser);
-  showSection("new-patient-section");
+
+  // Si venís de patient.html con ?view=list, mostrar directamente el listado
+  const params = new URLSearchParams(window.location.search);
+  const view = params.get("view");
+  if (view === "list") {
+    showSection("patients-list-section");
+  } else {
+    // Por defecto, también dejamos el listado
+    showSection("patients-list-section");
+  }
 } else {
   showLogin();
 }

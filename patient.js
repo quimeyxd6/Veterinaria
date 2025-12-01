@@ -47,6 +47,20 @@ function getQueryParam(name) {
   return params.get(name);
 }
 
+function returnToListAndClose() {
+  if (window.opener && !window.opener.closed) {
+    try {
+      // Recargar la pestaña original, y forzar vista listado fichas
+      window.opener.location.href = "index.html?view=list";
+    } catch (e) {
+      console.error("No se pudo actualizar la pestaña de origen", e);
+    }
+    window.close();
+  } else {
+    window.location.href = "index.html?view=list";
+  }
+}
+
 // chips
 function renderChipsWithSelection(containerId, optionsArray, selectedValues) {
   const container = document.getElementById(containerId);
@@ -89,7 +103,7 @@ const inputNotes = document.getElementById("edit-patient-notes");
 
 // volver al listado
 backBtn.addEventListener("click", () => {
-  window.location.href = "index.html";
+  returnToListAndClose();
 });
 
 const patientId = getQueryParam("id");
@@ -172,5 +186,5 @@ form.addEventListener("submit", (e) => {
 
   setPatients(patients);
   alert("Cambios guardados correctamente.");
-  window.location.href = "index.html";
+  returnToListAndClose();
 });
